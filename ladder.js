@@ -1,37 +1,44 @@
-
-
-
 $(function(){
+    var ladder;
+    var ladder_canvas;    
+    var heightNode = 10;
+    var widthNode =  0;
+    var LADDER_NODE = {};
+    var row =0;
+    var GLOBAL_FOOT_PRINT= {};
+    var GLOBAL_CHECK_FOOT_PRINT= {};
+    var working = false;
+        
     const WORD_KR = {
         title:"사다리게임",
         join:"참가자수",
         min_msg:"게임을 하기위해서는 2이상을 입력해야합니다.",
-        max_msg:"입력가능한 갯수는 10개까지 입니다."
+        max_msg:"입력가능한 갯수는 10개까지 입니다.",
+        noNumber_msg:"숫자를 입력해주세요."
     };
     
     const WORD_JP = {
         title:"あみだくじ",
         join:"参加者数",
         min_msg:"ゲームをするためには、２以上の数字を入力してください。",
-        max_msg:"入力可能な個数は１０個までです。"
+        max_msg:"入力可能な個数は１０個までです。",
+        noNumber_msg:"数字を入力してください。"
     };
     
     var WORD = WORD_JP;
     initWord(WORD);
-    var ladder = $('#ladder');
-    var ladder_canvas = $('#ladder_canvas');
-    var heightNode = 10;
-    var widthNode =  0;
-    var LADDER = {};
-    var row =0;
-    var GLOBAL_FOOT_PRINT= {};
-    var GLOBAL_CHECK_FOOT_PRINT= {};
-    var working = false;
+
     function initWord(word){
         $('#join').html(word.join);
         $('#title').html(word.title);
     }
     function init(){
+        heightNode = 10;
+        LADDER_NODE = {};
+        row =0;
+        GLOBAL_FOOT_PRINT= {};
+        GLOBAL_CHECK_FOOT_PRINT= {};
+        working = false;
         canvasDraw();
     }
     $('.language').click(function(){
@@ -45,6 +52,9 @@ $(function(){
     });
     $('#start').click(function(){
         let member = $('input[name=member]').val();
+        if(isNaN(member)){
+            return alert(WORD.noNumber_msg)
+        }
         if(member < 2){
             return alert(WORD.min_msg);
         }
@@ -52,6 +62,7 @@ $(function(){
             return alert(WORD.max_msg);   
         }
         widthNode = member;
+        console.log("member:"+widthNode);
         setTimeout(function(){
             $('#back').show();
             $('#landing').hide();
@@ -60,11 +71,18 @@ $(function(){
 
     });
     $('#back').click(function(){
-        $("#ladder").hide();
-        $('#landing').show();
+        ladder.html('');
+        setTimeout(function(){
+            $("#ladder").hide();
+            $('#landing').show();
+        }, 310);
     });
 
     function canvasDraw(){
+        ladder = $('#ladder');
+        ladder.show();
+        ladder.html('<div class="dim"></div><canvas class="ladder_canvas" id="ladder_canvas"></canvas>');        
+        ladder_canvas = $('#ladder_canvas');
         ladder.css({
             'width' :( widthNode-1) * 100 + 6,
             'height' : (heightNode -1 ) * 25 + 6,
@@ -229,7 +247,8 @@ $(function(){
 
 
     function userSetting(){
-        var userList = LADDER[0];
+        var userList = LADDER_NODE[0];
+        console.log('userList:'+userList);
         var html = '';
         for(var i=0; i <  userList.length; i++){
             var color = '#'+(function lol(m,s,c){return s[m.floor(m.random() * s.length)] + (c && lol(m,s,c-1));})(Math,'0123456789ABCDEF',4);
@@ -243,7 +262,7 @@ $(function(){
         ladder.append(html);
     }
     function resultSetting(){
-         var resultList = LADDER[heightNode-1];
+         var resultList = LADDER_NODE[heightNode-1];
          console.log(resultList )
 
         var html = '';
@@ -390,7 +409,7 @@ $(function(){
                 });
                 ladder.append(node);
              }
-             LADDER[row] =  rowArr;
+             LADDER_NODE[row] =  rowArr;
              row++;
         }
     }
